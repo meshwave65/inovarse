@@ -11,12 +11,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function createPartnerLead(data: any) {
+  // Esta parte é CRUCIAL: Mapeia o nome do campo para o que o banco espera
+  const dbData = {
+    ...data,
+    tipo_servico: data.tipoServico, 
+  };
+  delete dbData.tipoServico; // Remove a chave antiga para não dar erro de coluna inexistente
+
   const { error } = await supabase
     .from('partner_leads')
-    .insert(data);
+    .insert(dbData);
 
   if (error) {
-    console.error("Erro ao criar partner lead:", error);
+    console.error("Erro detalhado do Supabase:", error);
     throw new Error("Erro ao salvar lead de parceiro");
   }
   return { success: true };
