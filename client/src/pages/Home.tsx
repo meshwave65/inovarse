@@ -498,9 +498,9 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Contato</h4>
               <ul className="space-y-2 text-sm text-white/70">
-                <li>Email: contato@inovarse.com</li>
-                <li>Telefone: (11) 9999-9999</li>
-                <li>São Paulo, SP</li>
+                <li>Email: contato@inovarse.com.br</li>
+                <li>Telefone: +351 914 845 439</li>
+                <li>Lisboa - Portugal</li>
               </ul>
             </div>
           </div>
