@@ -63,7 +63,7 @@ export async function createMceLead(data: {
     .select('id');
 
   if (error) {
-    console.error("ERRO SUPABASE (leads):", error.message, error.details, error.hint);
+    console.error("ERRO SUPABASE (leads):", error.message);
     throw new Error(`Erro ao salvar lead: ${error.message}`);
   }
 
@@ -79,6 +79,7 @@ export async function createMceLead(data: {
 
 /**
  * Cria o resultado do teste MBP Triangle na tabela `results`.
+ * Suporta tanto lead_id quanto leadId para máxima compatibilidade.
  */
 export async function createMceResult(data: {
   leadId: any;
@@ -91,14 +92,16 @@ export async function createMceResult(data: {
 }): Promise<{ success: boolean }> {
   console.log("Tentando criar resultado na tabela 'results' para leadId:", data.leadId);
   
-  const payload = {
+  // Payload com suporte a ambos os nomes de coluna (lead_id e leadId)
+  // O Supabase ignora colunas que não existem se configurado, mas aqui enviamos o que é padrão
+  const payload: any = {
     lead_id: data.leadId,
-    mind: data.mind,
-    body: data.body,
-    purpose: data.purpose,
-    pref_mind: data.prefMind,
-    pref_body: data.prefBody,
-    pref_purpose: data.prefPurpose,
+    mind: Number(data.mind),
+    body: Number(data.body),
+    purpose: Number(data.purpose),
+    pref_mind: Number(data.prefMind),
+    pref_body: Number(data.prefBody),
+    pref_purpose: Number(data.prefPurpose),
   };
 
   const { error } = await supabase
@@ -106,8 +109,25 @@ export async function createMceResult(data: {
     .insert(payload);
 
   if (error) {
-    console.error("ERRO SUPABASE (results):", error.message, error.details, error.hint);
-    console.error("Payload enviado:", payload);
+    console.error("ERRO SUPABASE (results):", error.message);
+    
+    // TENTATIVA DE BACKUP: Se falhou por lead_id, tenta com leadId (camelCase)
+    if (error.message.includes("column \"lead_id\" does not exist")) {
+      console.log("Tentando novamente com a coluna 'leadId'...");
+      const backupPayload = { ...payload, leadId: data.leadId };
+      delete backupPayload.lead_id;
+      
+      const { error: error2 } = await supabase
+        .from('results')
+        .insert(backupPayload);
+        
+      if (!error2) {
+        console.log("Resultado salvo com sucesso usando 'leadId'!");
+        return { success: true };
+      }
+      throw new Error(`Erro ao salvar resultado (tentativa 2): ${error2.message}`);
+    }
+    
     throw new Error(`Erro ao salvar resultado: ${error.message}`);
   }
 
