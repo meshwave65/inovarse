@@ -11,12 +11,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function createPartnerLead(data: any) {
-  // Esta parte é CRUCIAL: Mapeia o nome do campo para o que o banco espera
   const dbData = {
     ...data,
     tipo_servico: data.tipoServico, 
   };
-  delete dbData.tipoServico; // Remove a chave antiga para não dar erro de coluna inexistente
+  delete dbData.tipoServico;
 
   const { error } = await supabase
     .from('partner_leads')
@@ -52,7 +51,8 @@ export async function createMceLead(data: {
   telefone: string;
   email: string;
 }): Promise<{ id: any }> {
-  // Tenta inserir e retornar o ID gerado
+  console.log("Tentando criar lead na tabela 'leads'...", data);
+  
   const { data: inserted, error } = await supabase
     .from('leads')
     .insert({
@@ -60,20 +60,21 @@ export async function createMceLead(data: {
       telefone: data.telefone,
       email: data.email,
     })
-    .select('id'); // Removemos o .single() para evitar erro se o retorno for vazio ou múltiplo
+    .select('id');
 
   if (error) {
-    console.error("Erro ao criar lead na tabela 'leads':", error);
+    console.error("ERRO SUPABASE (leads):", error.message, error.details, error.hint);
     throw new Error(`Erro ao salvar lead: ${error.message}`);
   }
 
   if (!inserted || inserted.length === 0) {
-    console.error("Nenhum dado retornado após inserção na tabela 'leads'");
+    console.error("ERRO: Nenhum dado retornado após inserção na tabela 'leads'");
     throw new Error("Erro ao capturar ID do lead gerado");
   }
 
-  // Retorna o ID (pode ser UUID ou Inteiro)
-  return { id: inserted[0].id };
+  const leadId = inserted[0].id;
+  console.log("Lead criado com sucesso! ID:", leadId);
+  return { id: leadId };
 }
 
 /**
@@ -88,32 +89,34 @@ export async function createMceResult(data: {
   prefBody: number;
   prefPurpose: number;
 }): Promise<{ success: boolean }> {
+  console.log("Tentando criar resultado na tabela 'results' para leadId:", data.leadId);
+  
+  const payload = {
+    lead_id: data.leadId,
+    mind: data.mind,
+    body: data.body,
+    purpose: data.purpose,
+    pref_mind: data.prefMind,
+    pref_body: data.prefBody,
+    pref_purpose: data.prefPurpose,
+  };
+
   const { error } = await supabase
     .from('results')
-    .insert({
-      lead_id: data.leadId,
-      mind: data.mind,
-      body: data.body,
-      purpose: data.purpose,
-      pref_mind: data.prefMind,
-      pref_body: data.prefBody,
-      pref_purpose: data.prefPurpose,
-    });
+    .insert(payload);
 
   if (error) {
-    console.error("Erro ao criar resultado na tabela 'results':", error);
-    console.error("Dados enviados:", { lead_id: data.leadId, mind: data.mind });
+    console.error("ERRO SUPABASE (results):", error.message, error.details, error.hint);
+    console.error("Payload enviado:", payload);
     throw new Error(`Erro ao salvar resultado: ${error.message}`);
   }
 
+  console.log("Resultado salvo com sucesso na tabela 'results'!");
   return { success: true };
 }
 
 // ─── User Management (necessário para autenticação OAuth) ──────────────────
 
-/**
- * Busca um usuário pelo openId (identificador OAuth).
- */
 export async function getUserByOpenId(openId: string) {
   const { data, error } = await supabase
     .from('users')
@@ -129,9 +132,6 @@ export async function getUserByOpenId(openId: string) {
   return data || null;
 }
 
-/**
- * Cria ou atualiza um usuário (upsert por openId).
- */
 export async function upsertUser(data: {
   openId: string;
   name?: string | null;
@@ -160,7 +160,6 @@ export async function upsertUser(data: {
   return { success: true };
 }
 
-// Mantido para compatibilidade
 export async function getDb() {
   return supabase;
 }

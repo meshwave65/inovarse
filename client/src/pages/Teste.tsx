@@ -11,19 +11,15 @@ interface LeadData {
 }
 
 interface ResultData {
-  // Valores calculados (combinação de sliders + preferências pareadas)
   altMind: string
   altBody: string
   altPurpose: string
-  // Deslocamentos laterais (preferências pessoais)
   deslocMind: string
   deslocBody: string
   deslocPurpose: string
-  // Valores ideais (preferências primárias)
   prefMind: number
   prefBody: number
   prefPurpose: number
-  // Preferências pareadas
   pairedMB: { mind: number; body: number }
   pairedBP: { body: number; purpose: number }
   pairedMP: { mind: number; purpose: number }
@@ -71,13 +67,11 @@ export default function Teste() {
   const [showIntro, setShowIntro] = useState(true)
   const [showSliders, setShowSliders] = useState(false)
 
-  // Sliders principais: Mind e Body (Purpose é calculado)
   const [mind, setMind] = useState(4)
   const [body, setBody] = useState(3)
   const restante = Math.max(0, 10 - mind)
   const purpose = Math.max(0, restante - body)
 
-  // Preferências pareadas (balanços secundários)
   const [pairedMB, setPairedMB] = useState({ mind: 5, body: 5 })
   const [pairedBP, setPairedBP] = useState({ body: 5, purpose: 5 })
   const [pairedMP, setPairedMP] = useState({ mind: 5, purpose: 5 })
@@ -100,12 +94,10 @@ export default function Teste() {
   const calcular = async () => {
     setLoading(true)
 
-    // Cálculo das alturas combinadas (slider + influência das preferências pareadas)
     const altMind = ((mind + pairedMB.mind * 0.5 + pairedMP.mind * 0.5) / 2).toFixed(1)
     const altBody = ((body + pairedMB.body * 0.5 + pairedBP.body * 0.5) / 2).toFixed(1)
     const altPurpose = ((purpose + pairedBP.purpose * 0.5 + pairedMP.purpose * 0.5) / 2).toFixed(1)
 
-    // Deslocamentos laterais (expressões autênticas de preferência pessoal)
     const deslocMind = ((pairedMB.mind - pairedMB.body) + (pairedMP.mind - pairedMP.purpose)) / 2
     const deslocBody = ((pairedMB.body - pairedMB.mind) + (pairedBP.body - pairedBP.purpose)) / 2
     const deslocPurpose = ((pairedBP.purpose - pairedBP.body) + (pairedMP.purpose - pairedMP.mind)) / 2
@@ -126,7 +118,7 @@ export default function Teste() {
     }
 
     try {
-      // Salvar lead e resultado via tRPC
+      console.log("Iniciando submissão de lead...");
       const leadResult = await submitLeadMutation.mutateAsync({
         nome: leads.nome.trim(),
         telefone: leads.telefone.trim(),
@@ -134,7 +126,8 @@ export default function Teste() {
       })
 
       if (leadResult.success && leadResult.leadId) {
-        await submitResultMutation.mutateAsync({
+        console.log("Lead salvo com ID:", leadResult.leadId, ". Salvando resultado...");
+        const resultSave = await submitResultMutation.mutateAsync({
           leadId: leadResult.leadId,
           mind: parseFloat(altMind),
           body: parseFloat(altBody),
@@ -143,13 +136,18 @@ export default function Teste() {
           prefBody: body,
           prefPurpose: purpose,
         })
-        toast.success("Seu perfil foi salvo com sucesso!")
+        
+        if (resultSave.success) {
+          toast.success("Seu perfil foi salvo com sucesso!")
+        } else {
+          toast.error(`Erro ao salvar resultado: ${resultSave.message}`)
+        }
       } else {
-        toast.error("Erro ao registrar seus dados no banco.")
+        toast.error(`Erro ao registrar lead: ${leadResult.message}`)
       }
     } catch (err: any) {
-      console.error("Erro ao salvar resultado:", err)
-      toast.error("Erro de conexão com o servidor. Verifique se as tabelas existem no Supabase.")
+      console.error("Erro fatal na submissão:", err)
+      toast.error(`Erro de conexão: ${err.message || "Verifique o console do navegador"}`)
     } finally {
       setResult(res)
       localStorage.setItem("mbpTriangle_result", JSON.stringify(res))
@@ -254,7 +252,6 @@ export default function Teste() {
   const primaryButtonClass =
     "inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 px-5 py-3 text-sm font-semibold tracking-wide text-white shadow-[0_18px_40px_-18px_rgba(13,148,136,0.7)] transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_48px_-20px_rgba(13,148,136,0.82)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
 
-  // ─── Tela de Introdução ───────────────────────────────────────────────────
   if (showIntro) {
     return (
       <div className="relative min-h-screen overflow-hidden bg-slate-50">
@@ -331,7 +328,6 @@ export default function Teste() {
     )
   }
 
-  // ─── Tela dos Sliders ─────────────────────────────────────────────────────
   if (showSliders && !result) {
     return (
       <div className="relative min-h-screen overflow-hidden bg-slate-50">
@@ -509,7 +505,6 @@ export default function Teste() {
     )
   }
 
-  // ─── Tela de Resultado ────────────────────────────────────────────────────
   if (result) {
     const whatsappMessage = encodeURIComponent(
       `Olá! Vim do site Inovarse e fiz o Teste MBP Triangle.\n\n` +
