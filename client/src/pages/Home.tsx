@@ -24,7 +24,7 @@ export default function Home() {
           </div>
           <div className="hidden md:flex gap-8">
             <a href="#filosofia" className="text-sm text-muted-foreground hover:text-foreground transition">Filosofia</a>
-            <a href="#teste" className="text-sm text-muted-foreground hover:text-foreground transition">Teste MCE</a>
+            <a href="#teste" className="text-sm text-muted-foreground hover:text-foreground transition">MBP Triangle</a>
             <a href="#programas" className="text-sm text-muted-foreground hover:text-foreground transition">Programas</a>
             <a href="#rede" className="text-sm text-muted-foreground hover:text-foreground transition">Rede</a>
             <a href="/contato" className="text-sm text-muted-foreground hover:text-foreground transition">Contato</a>
@@ -46,11 +46,11 @@ export default function Home() {
               A verdadeira beleza nasce de dentro para fora
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Bem-vindo ao Ecossistema Inovarse, onde integramos Mente, Corpo e Espírito em uma abordagem holística e preventiva de saúde e bem-estar.
+              Bem-vindo ao Ecossistema Inovarse, onde integramos Mente, Corpo e Propósito em uma abordagem holística e preventiva de saúde e bem-estar.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2" onClick={() => setLocation("/teste")}>
-                Comece o Teste MCE <ArrowRight className="w-4 h-4" />
+                Fazer o Teste MBP Triangle <ArrowRight className="w-4 h-4" />
               </Button>
               <Button size="lg" variant="outline" onClick={() => setLocation("#filosofia")}>
                 Saiba Mais
@@ -58,7 +58,7 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* MCE Triangle Visual */}
+          {/* MBP Triangle Visual */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }} 
             animate={{ opacity: 1, scale: 1 }} 
@@ -74,9 +74,9 @@ export default function Home() {
                 <path d="M 150 30 L 150 100 L 225 250 Z" fill="#d1fae5" opacity="0.3" />
                 
                 {/* Labels */}
-                <text x="150" y="25" textAnchor="middle" className="text-sm font-bold fill-foreground">MENTE</text>
-                <text x="40" y="270" textAnchor="middle" className="text-sm font-bold fill-foreground">CORPO</text>
-                <text x="260" y="270" textAnchor="middle" className="text-sm font-bold fill-foreground">ESPÍRITO</text>
+                <text x="150" y="25" textAnchor="middle" className="text-sm font-bold fill-foreground">MIND</text>
+                <text x="40" y="270" textAnchor="middle" className="text-sm font-bold fill-foreground">BODY</text>
+                <text x="260" y="270" textAnchor="middle" className="text-sm font-bold fill-foreground">PURPOSE</text>
               </svg>
             </div>
           </motion.div>
@@ -94,7 +94,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Mente */}
+            {/* Mind */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -104,13 +104,14 @@ export default function Home() {
               <div className="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">Mente</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-1">Mind</h3>
+              <p className="text-sm font-medium text-blue-600 mb-3">Mente</p>
               <p className="text-muted-foreground">
                 Clareza mental, foco, paz interior e gestão do estresse. Uma mente equilibrada é a base para decisões conscientes e bem-estar emocional.
               </p>
             </motion.div>
 
-            {/* Corpo */}
+            {/* Body */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -120,13 +121,14 @@ export default function Home() {
               <div className="w-12 h-12 rounded-lg bg-emerald-500 text-white flex items-center justify-center mb-4">
                 <Heart className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">Corpo</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-1">Body</h3>
+              <p className="text-sm font-medium text-emerald-600 mb-3">Corpo</p>
               <p className="text-muted-foreground">
                 Vitalidade física, nutrição adequada, movimento consciente e cuidado estético. Um corpo saudável reflete a harmonia interna.
               </p>
             </motion.div>
 
-            {/* Espírito */}
+            {/* Purpose */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -136,16 +138,17 @@ export default function Home() {
               <div className="w-12 h-12 rounded-lg bg-purple-500 text-white flex items-center justify-center mb-4">
                 <Leaf className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3">Espírito</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-1">Purpose</h3>
+              <p className="text-sm font-medium text-purple-600 mb-3">Propósito</p>
               <p className="text-muted-foreground">
-                Propósito, conexão, gratidão e tempo para si. O espírito alimentado torna a vida significativa e plena.
+                Propósito, conexão, gratidão e tempo para si. O propósito alimentado torna a vida significativa e plena.
               </p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Teste MCE Section */}
+      {/* Teste MBP Triangle Section */}
       <section id="teste" className="py-20 bg-emerald-50">
         <div className="container max-w-6xl mx-auto px-4">
           <motion.div {...fadeInUp} className="max-w-3xl mx-auto">
@@ -155,32 +158,32 @@ export default function Home() {
                   <Zap className="w-8 h-8 text-accent" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-foreground">Teste Triângulo MCE</h2>
-                  <p className="text-muted-foreground">Descubra seu equilíbrio pessoal</p>
+                  <h2 className="text-3xl font-bold text-foreground">Teste MBP Triangle</h2>
+                  <p className="text-muted-foreground">Descubra suas preferências e aspirações pessoais</p>
                 </div>
               </div>
               
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                O Teste Triângulo MCE é nossa ferramenta diagnóstica central. Em poucos minutos, você receberá um mapa personalizado do seu equilíbrio entre Mente, Corpo e Espírito, revelando oportunidades para otimizar sua saúde e bem-estar integral.
+                O <strong>MBP Triangle</strong> (Mind-Body-Purpose) é nossa ferramenta de autoconhecimento central. Em poucos minutos, você receberá um mapa personalizado das suas preferências e aspirações nas três dimensões fundamentais — sem julgamentos, sem diagnósticos, apenas o seu perfil único.
               </p>
 
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-semibold text-blue-900 mb-2">Diagnóstico Rápido</p>
-                  <p className="text-sm text-muted-foreground">Avaliação completa em 5 minutos</p>
+                  <p className="text-sm font-semibold text-blue-900 mb-2">Mapeamento de Preferências</p>
+                  <p className="text-sm text-muted-foreground">Entenda como você naturalmente distribui sua energia</p>
                 </div>
                 <div className="p-4 bg-emerald-50 rounded-lg">
-                  <p className="text-sm font-semibold text-emerald-900 mb-2">Personalizado</p>
-                  <p className="text-sm text-muted-foreground">Recomendações exclusivas para você</p>
+                  <p className="text-sm font-semibold text-emerald-900 mb-2">Perfil Personalizado</p>
+                  <p className="text-sm text-muted-foreground">Recomendações alinhadas ao seu estilo único</p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg">
-                  <p className="text-sm font-semibold text-purple-900 mb-2">Contínuo</p>
-                  <p className="text-sm text-muted-foreground">Acompanhe sua evolução ao longo do tempo</p>
+                  <p className="text-sm font-semibold text-purple-900 mb-2">Programa Contínuo</p>
+                  <p className="text-sm text-muted-foreground">Evolução respeitando suas preferências pessoais</p>
                 </div>
               </div>
 
               <Button size="lg" className="w-full bg-accent hover:bg-accent/90 text-white gap-2" onClick={() => setLocation("/teste")}>
-                Começar Teste Agora <ArrowRight className="w-4 h-4" />
+                Começar o Teste MBP Triangle <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
           </motion.div>
@@ -193,12 +196,13 @@ export default function Home() {
           <motion.div {...fadeInUp} className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">Programas GlowFit</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Pacotes personalizados que integram tratamentos, procedimentos e consultas especializadas para seu equilíbrio MCE.
+              Pacotes personalizados que integram tratamentos, procedimentos e consultas especializadas para o seu perfil MBP.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* GlowFit Mente */}
+     
+            {/* GlowFit Mind */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -209,7 +213,7 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center mb-4">
                     <Sparkles className="w-6 h-6" />
                   </div>
-                  <CardTitle>GlowFit Mente</CardTitle>
+                  <CardTitle>GlowFit Mind</CardTitle>
                   <CardDescription>Equilíbrio emocional e clareza mental</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -235,7 +239,7 @@ export default function Home() {
               </Card>
             </motion.div>
 
-            {/* GlowFit Corpo */}
+            {/* GlowFit Body */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -246,7 +250,7 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-emerald-500 text-white flex items-center justify-center mb-4">
                     <Heart className="w-6 h-6" />
                   </div>
-                  <CardTitle>GlowFit Corpo</CardTitle>
+                  <CardTitle>GlowFit Body</CardTitle>
                   <CardDescription>Vitalidade física e estética avançada</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -272,7 +276,7 @@ export default function Home() {
               </Card>
             </motion.div>
 
-            {/* GlowFit Espírito */}
+            {/* GlowFit Purpose */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -283,7 +287,7 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-purple-500 text-white flex items-center justify-center mb-4">
                     <Leaf className="w-6 h-6" />
                   </div>
-                  <CardTitle>GlowFit Espírito</CardTitle>
+                  <CardTitle>GlowFit Purpose</CardTitle>
                   <CardDescription>Propósito e conexão interior</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -346,7 +350,7 @@ export default function Home() {
                   <span className="text-accent font-bold text-lg">✓</span>
                   <div>
                     <p className="font-semibold text-foreground">Personalização</p>
-                    <p className="text-sm text-muted-foreground">Recomendações baseadas no seu Teste MCE</p>
+                    <p className="text-sm text-muted-foreground">Recomendações baseadas no seu perfil MBP Triangle</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
@@ -388,7 +392,7 @@ export default function Home() {
                 <li className="flex gap-3">
                   <span className="text-accent font-bold text-lg">✓</span>
                   <div>
-                    <p className="font-semibold text-foreground">Marketing Conjuto</p>
+                    <p className="font-semibold text-foreground">Marketing Conjunto</p>
                     <p className="text-sm text-muted-foreground">Campanhas e suporte da marca Inovarse</p>
                   </div>
                 </li>
@@ -431,7 +435,7 @@ export default function Home() {
                   <Heart className="w-6 h-6 text-accent" />
                 </div>
                 <p className="font-semibold text-foreground mb-2">Alinhamento</p>
-                <p className="text-sm text-muted-foreground">Compromisso com abordagem integrativa</p>
+                <p className="text-sm text-muted-foreground">Compromisso com abordagem integrativa MBP</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-3">
@@ -482,7 +486,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Navegação</h4>
               <ul className="space-y-2 text-sm text-white/70">
                 <li><a href="#filosofia" className="hover:text-white transition">Filosofia</a></li>
-                <li><a href="#teste" className="hover:text-white transition">Teste MCE</a></li>
+                <li><a href="#teste" className="hover:text-white transition">MBP Triangle</a></li>
                 <li><a href="#programas" className="hover:text-white transition">Programas</a></li>
                 <li><a href="#rede" className="hover:text-white transition">Rede</a></li>
               </ul>
@@ -496,36 +500,31 @@ export default function Home() {
               </ul>
             </div>
             <div>
-  <h4 className="font-semibold mb-4">Contato</h4>
-
-  <ul className="space-y-2 text-sm text-white/70">
-    
-    <li>
-      Email:{" "}
-      <a
-        href="mailto:contato@inovarseestetica.com.br"
-        className="underline hover:text-white"
-      >
-        contato@inovarseestetica.com.br
-      </a>
-    </li>
-
-    <li>
-      WhatsApp:{" "}
-      <a
-        href="https://wa.me/351914845439?text=Olá,%20vim%20pelo%20site%20INOVARSE"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline hover:text-white"
-      >
-        +351 914 845 439
-      </a>
-    </li>
-
-    <li>Lisboa - Portugal</li>
-
-  </ul>
-</div>
+              <h4 className="font-semibold mb-4">Contato</h4>
+              <ul className="space-y-2 text-sm text-white/70">
+                <li>
+                  Email:{" "}
+                  <a
+                    href="mailto:contato@inovarseestetica.com.br"
+                    className="underline hover:text-white"
+                  >
+                    contato@inovarseestetica.com.br
+                  </a>
+                </li>
+                <li>
+                  WhatsApp:{" "}
+                  <a
+                    href="https://wa.me/351914845439?text=Olá,%20vim%20pelo%20site%20INOVARSE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-white"
+                  >
+                    +351 914 845 439
+                  </a>
+                </li>
+                <li>Lisboa - Portugal</li>
+              </ul>
+            </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-sm text-white/70">
             <p>&copy; 2026 Ecossistema Inovarse. Todos os direitos reservados.</p>
