@@ -44,14 +44,14 @@ export async function createContact(data: any) {
 
 /**
  * Cria um lead do teste MBP Triangle na tabela `leads`.
- * Retorna o ID gerado para ser usado ao salvar o resultado.
+ * Retorna o ID gerado (Inteiro/int8) para ser usado ao salvar o resultado.
  */
 export async function createMceLead(data: {
   nome: string;
   telefone: string;
   email: string;
-}): Promise<{ id: any }> {
-  console.log("Tentando criar lead na tabela 'leads'...", data);
+}): Promise<{ id: number }> {
+  console.log("Tentando criar lead na tabela 'leads' (padrão INT8)...", data);
   
   const { data: inserted, error } = await supabase
     .from('leads')
@@ -72,17 +72,18 @@ export async function createMceLead(data: {
     throw new Error("Erro ao capturar ID do lead gerado");
   }
 
-  const leadId = inserted[0].id;
-  console.log("Lead criado com sucesso! ID:", leadId);
+  // Converte explicitamente para número (int8)
+  const leadId = Number(inserted[0].id);
+  console.log("Lead criado com sucesso! ID (int8):", leadId);
   return { id: leadId };
 }
 
 /**
  * Cria o resultado do teste MBP Triangle na tabela `results`.
- * Suporta tanto lead_id quanto leadId para máxima compatibilidade.
+ * Garante que o leadId seja tratado como número inteiro.
  */
 export async function createMceResult(data: {
-  leadId: any;
+  leadId: number;
   mind: number;
   body: number;
   purpose: number;
@@ -90,12 +91,10 @@ export async function createMceResult(data: {
   prefBody: number;
   prefPurpose: number;
 }): Promise<{ success: boolean }> {
-  console.log("Tentando criar resultado na tabela 'results' para leadId:", data.leadId);
+  console.log("Tentando criar resultado na tabela 'results' para leadId (int8):", data.leadId);
   
-  // Payload com suporte a ambos os nomes de coluna (lead_id e leadId)
-  // O Supabase ignora colunas que não existem se configurado, mas aqui enviamos o que é padrão
-  const payload: any = {
-    lead_id: data.leadId,
+  const payload = {
+    lead_id: Number(data.leadId), // Força conversão para número inteiro
     mind: Number(data.mind),
     body: Number(data.body),
     purpose: Number(data.purpose),
@@ -110,11 +109,12 @@ export async function createMceResult(data: {
 
   if (error) {
     console.error("ERRO SUPABASE (results):", error.message);
+    console.error("Payload enviado:", payload);
     
     // TENTATIVA DE BACKUP: Se falhou por lead_id, tenta com leadId (camelCase)
     if (error.message.includes("column \"lead_id\" does not exist")) {
       console.log("Tentando novamente com a coluna 'leadId'...");
-      const backupPayload = { ...payload, leadId: data.leadId };
+      const backupPayload = { ...payload, leadId: Number(data.leadId) };
       delete backupPayload.lead_id;
       
       const { error: error2 } = await supabase
