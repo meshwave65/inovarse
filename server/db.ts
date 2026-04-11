@@ -44,14 +44,14 @@ export async function createContact(data: any) {
 
 /**
  * Cria um lead do teste MBP Triangle na tabela `leads`.
- * Retorna o ID gerado (Inteiro/int8) para ser usado ao salvar o resultado.
+ * Retorna o ID gerado (UUID) para ser usado ao salvar o resultado.
  */
 export async function createMceLead(data: {
   nome: string;
   telefone: string;
   email: string;
-}): Promise<{ id: number }> {
-  console.log("Tentando criar lead na tabela 'leads' (padrão INT8)...", data);
+}): Promise<{ id: string }> {
+  console.log("Tentando criar lead na tabela 'leads' (padrão UUID)...", data);
   
   const { data: inserted, error } = await supabase
     .from('leads')
@@ -72,18 +72,18 @@ export async function createMceLead(data: {
     throw new Error("Erro ao capturar ID do lead gerado");
   }
 
-  // Converte explicitamente para número (int8)
-  const leadId = Number(inserted[0].id);
-  console.log("Lead criado com sucesso! ID (int8):", leadId);
+  // Retorna o ID como string (UUID)
+  const leadId = String(inserted[0].id);
+  console.log("Lead criado com sucesso! ID (UUID):", leadId);
   return { id: leadId };
 }
 
 /**
  * Cria o resultado do teste MBP Triangle na tabela `results`.
- * Garante que o leadId seja tratado como número inteiro.
+ * Garante que o leadId seja tratado como string (UUID).
  */
 export async function createMceResult(data: {
-  leadId: number;
+  leadId: string;
   mind: number;
   body: number;
   purpose: number;
@@ -91,10 +91,10 @@ export async function createMceResult(data: {
   prefBody: number;
   prefPurpose: number;
 }): Promise<{ success: boolean }> {
-  console.log("Tentando criar resultado na tabela 'results' para leadId (int8):", data.leadId);
+  console.log("Tentando criar resultado na tabela 'results' para leadId (UUID):", data.leadId);
   
   const payload = {
-    lead_id: Number(data.leadId), // Força conversão para número inteiro
+    lead_id: String(data.leadId), // Garante que seja string (UUID)
     mind: Number(data.mind),
     body: Number(data.body),
     purpose: Number(data.purpose),
@@ -114,7 +114,7 @@ export async function createMceResult(data: {
     // TENTATIVA DE BACKUP: Se falhou por lead_id, tenta com leadId (camelCase)
     if (error.message.includes("column \"lead_id\" does not exist")) {
       console.log("Tentando novamente com a coluna 'leadId'...");
-      const backupPayload = { ...payload, leadId: Number(data.leadId) };
+      const backupPayload = { ...payload, leadId: String(data.leadId) };
       delete backupPayload.lead_id;
       
       const { error: error2 } = await supabase
