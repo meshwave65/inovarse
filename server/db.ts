@@ -44,7 +44,7 @@ export async function createContact(data: any) {
 // ─── MBP Triangle: Leads e Resultados ────────────────────────────────────
 
 /**
- * Cria um lead do teste MBP Triangle na tabela `mce_leads`.
+ * Cria um lead do teste MBP Triangle na tabela `leads`.
  * Retorna o ID gerado para ser usado ao salvar o resultado.
  */
 export async function createMceLead(data: {
@@ -53,7 +53,7 @@ export async function createMceLead(data: {
   email: string;
 }): Promise<{ id: string }> {
   const { data: inserted, error } = await supabase
-    .from('mce_leads')
+    .from('leads')
     .insert({
       nome: data.nome,
       telefone: data.telefone,
@@ -63,7 +63,7 @@ export async function createMceLead(data: {
     .single();
 
   if (error) {
-    console.error("Erro ao criar lead MBP:", error);
+    console.error("Erro ao criar lead MBP na tabela leads:", error);
     throw new Error("Erro ao salvar lead do teste MBP Triangle");
   }
 
@@ -71,7 +71,7 @@ export async function createMceLead(data: {
 }
 
 /**
- * Cria o resultado do teste MBP Triangle na tabela `mce_results`.
+ * Cria o resultado do teste MBP Triangle na tabela `results`.
  * Armazena tanto os valores calculados (combinação de sliders + preferências pareadas)
  * quanto as preferências primárias brutas do usuário.
  */
@@ -85,7 +85,7 @@ export async function createMceResult(data: {
   prefPurpose: number;
 }): Promise<{ success: boolean }> {
   const { error } = await supabase
-    .from('mce_results')
+    .from('results')
     .insert({
       lead_id: data.leadId,
       mind: data.mind,
@@ -97,7 +97,7 @@ export async function createMceResult(data: {
     });
 
   if (error) {
-    console.error("Erro ao criar resultado MBP:", error);
+    console.error("Erro ao criar resultado MBP na tabela results:", error);
     throw new Error("Erro ao salvar resultado do teste MBP Triangle");
   }
 
