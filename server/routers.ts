@@ -114,7 +114,8 @@ export const appRouter = router({
      */
     submitResult: publicProcedure
       .input(z.object({
-        leadId: z.string().uuid("ID de lead inválido"),
+        // Removida a validação .uuid() para suportar IDs numéricos ou outros formatos do Supabase
+        leadId: z.any(), 
         // Valores calculados (combinação de sliders + preferências pareadas)
         mind: z.number().min(0).max(10),
         body: z.number().min(0).max(10),
