@@ -23,7 +23,7 @@ export async function createPartnerLead(data: any) {
     .insert(dbData);
 
   if (error) {
-    console.error("Erro detalhado do Supabase:", error);
+    console.error("Erro detalhado do Supabase (partner_leads):", error);
     throw new Error("Erro ao salvar lead de parceiro");
   }
   return { success: true };
@@ -51,7 +51,8 @@ export async function createMceLead(data: {
   nome: string;
   telefone: string;
   email: string;
-}): Promise<{ id: string }> {
+}): Promise<{ id: any }> {
+  // Tenta inserir e retornar o ID gerado
   const { data: inserted, error } = await supabase
     .from('leads')
     .insert({
@@ -59,24 +60,27 @@ export async function createMceLead(data: {
       telefone: data.telefone,
       email: data.email,
     })
-    .select('id')
-    .single();
+    .select('id'); // Removemos o .single() para evitar erro se o retorno for vazio ou múltiplo
 
   if (error) {
-    console.error("Erro ao criar lead MBP na tabela leads:", error);
-    throw new Error("Erro ao salvar lead do teste MBP Triangle");
+    console.error("Erro ao criar lead na tabela 'leads':", error);
+    throw new Error(`Erro ao salvar lead: ${error.message}`);
   }
 
-  return { id: inserted.id };
+  if (!inserted || inserted.length === 0) {
+    console.error("Nenhum dado retornado após inserção na tabela 'leads'");
+    throw new Error("Erro ao capturar ID do lead gerado");
+  }
+
+  // Retorna o ID (pode ser UUID ou Inteiro)
+  return { id: inserted[0].id };
 }
 
 /**
  * Cria o resultado do teste MBP Triangle na tabela `results`.
- * Armazena tanto os valores calculados (combinação de sliders + preferências pareadas)
- * quanto as preferências primárias brutas do usuário.
  */
 export async function createMceResult(data: {
-  leadId: string;
+  leadId: any;
   mind: number;
   body: number;
   purpose: number;
@@ -97,8 +101,9 @@ export async function createMceResult(data: {
     });
 
   if (error) {
-    console.error("Erro ao criar resultado MBP na tabela results:", error);
-    throw new Error("Erro ao salvar resultado do teste MBP Triangle");
+    console.error("Erro ao criar resultado na tabela 'results':", error);
+    console.error("Dados enviados:", { lead_id: data.leadId, mind: data.mind });
+    throw new Error(`Erro ao salvar resultado: ${error.message}`);
   }
 
   return { success: true };
