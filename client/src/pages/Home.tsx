@@ -496,13 +496,36 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contato</h4>
-              <ul className="space-y-2 text-sm text-white/70">
-                <li>Email: contato@inovarse.com.br</li>
-                <li>Telefone: +351 914 845 439</li>
-                <li>Lisboa - Portugal</li>
-              </ul>
-            </div>
+  <h4 className="font-semibold mb-4">Contato</h4>
+
+  <ul className="space-y-2 text-sm text-white/70">
+    
+    <li>
+      Email:{" "}
+      <a
+        href="mailto:contato@inovarseestetica.com.br"
+        className="underline hover:text-white"
+      >
+        contato@inovarseestetica.com.br
+      </a>
+    </li>
+
+    <li>
+      WhatsApp:{" "}
+      <a
+        href="https://wa.me/351914845439?text=Olá,%20vim%20pelo%20site%20INOVARSE"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-white"
+      >
+        +351 914 845 439
+      </a>
+    </li>
+
+    <li>Lisboa - Portugal</li>
+
+  </ul>
+</div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-sm text-white/70">
             <p>&copy; 2026 Ecossistema Inovarse. Todos os direitos reservados.</p>
