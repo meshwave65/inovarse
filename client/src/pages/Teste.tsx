@@ -1,12 +1,8 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowRight, Loader2, RefreshCw, Sparkles } from "lucide-react"
+import { ArrowRight, Loader2, RefreshCw, Sparkles, AlertCircle } from "lucide-react"
 import { trpc } from "@/lib/trpc"
-
-const HERO_BG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310419663029287297/oB8kVE32CcVmCbr6pyHqsc/inovarse-hero-background.webp"
-const RESULT_BG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310419663029287297/oB8kVE32CcVmCbr6pyHqsc/inovarse-result-background.webp"
+import { toast } from "sonner"
 
 interface LeadData {
   nome: string
@@ -93,6 +89,10 @@ export default function Teste() {
   const submitResultMutation = trpc.mce.submitResult.useMutation()
 
   const irParaSliders = () => {
+    if (!leads.nome || !leads.email || !leads.telefone) {
+      toast.error("Por favor, preencha todos os campos para continuar.")
+      return
+    }
     setShowIntro(false)
     setShowSliders(true)
   }
@@ -128,12 +128,12 @@ export default function Teste() {
     try {
       // Salvar lead e resultado via tRPC
       const leadResult = await submitLeadMutation.mutateAsync({
-        nome: leads.nome.trim() || "Visitante",
-        telefone: leads.telefone.trim() || "00000000000",
-        email: leads.email.trim() || "no@email.com",
+        nome: leads.nome.trim(),
+        telefone: leads.telefone.trim(),
+        email: leads.email.trim(),
       })
 
-      if (leadResult.leadId) {
+      if (leadResult.success && leadResult.leadId) {
         await submitResultMutation.mutateAsync({
           leadId: leadResult.leadId,
           mind: parseFloat(altMind),
@@ -143,10 +143,13 @@ export default function Teste() {
           prefBody: body,
           prefPurpose: purpose,
         })
+        toast.success("Seu perfil foi salvo com sucesso!")
+      } else {
+        toast.error("Erro ao registrar seus dados no banco.")
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao salvar resultado:", err)
-      // Continua mesmo com erro de persistência
+      toast.error("Erro de conexão com o servidor. Verifique se as tabelas existem no Supabase.")
     } finally {
       setResult(res)
       localStorage.setItem("mbpTriangle_result", JSON.stringify(res))
@@ -162,10 +165,6 @@ export default function Teste() {
     localStorage.removeItem("mbpTriangle_result")
   }
 
-  /**
-   * Interpretações exploratórias e respeitosas — NÃO diagnósticas.
-   * Baseadas nas preferências pessoais, não em evolução ou nível de desenvolvimento.
-   */
   const getInterpretation = (res: ResultData) => {
     const m = Number(res.altMind)
     const b = Number(res.altBody)
@@ -176,7 +175,6 @@ export default function Teste() {
     const diffP = Math.abs(p - res.prefPurpose)
     const maiorDiff = Math.max(diffM, diffB, diffP)
 
-    // Perfil: Harmonia Integrativa
     if (maiorDiff <= 1.2 && m > 3 && b > 3 && p > 3) {
       return (
         <div className="space-y-3 text-[15px] leading-relaxed">
@@ -188,16 +186,10 @@ export default function Teste() {
             transitar entre as demandas mentais, as necessidades físicas e a conexão com seu propósito
             com fluidez natural.
           </p>
-          <p>
-            No INOVARSE, nosso foco para você será a manutenção preventiva e o refinamento contínuo.
-            Sua base integrada permite tratamentos que potencializam sua vitalidade natural, focando
-            em longevidade e bem-estar sustentável.
-          </p>
         </div>
       )
     }
 
-    // Perfil: Mind-Centric
     if (diffM === maiorDiff) {
       return (
         <div className="space-y-3 text-[15px] leading-relaxed">
@@ -207,18 +199,12 @@ export default function Teste() {
           <p>
             Seu padrão MBP mostra uma preferência natural pela dimensão <strong>Mind</strong>. Você
             tende a priorizar processos cognitivos e a integrar Body e Purpose através de uma lente
-            mental — isso é uma expressão autêntica de quem você é.
-          </p>
-          <p>
-            Para o Programa Inovarse, isso significa que podemos enfatizar abordagens reflexivas,
-            analíticas e intelectuais, enquanto também integramos elementos corporais e de propósito
-            de uma forma que faça sentido para o seu estilo único.
+            mental.
           </p>
         </div>
       )
     }
 
-    // Perfil: Body-Centric
     if (diffB === maiorDiff) {
       return (
         <div className="space-y-3 text-[15px] leading-relaxed">
@@ -228,17 +214,12 @@ export default function Teste() {
           <p>
             Seu padrão MBP mostra uma preferência natural pela dimensão <strong>Body</strong>. Você
             tende a priorizar a manutenção fisiológica e a integrar Mind e Purpose através de uma
-            lente corporal e sensorial — isso é uma expressão autêntica de quem você é.
-          </p>
-          <p>
-            No INOVARSE, focaremos em protocolos de revitalização física e estética avançada,
-            respeitando sua preferência natural por abordagens práticas, físicas e sensoriais.
+            lente corporal e sensorial.
           </p>
         </div>
       )
     }
 
-    // Perfil: Purpose-Centric
     if (diffP === maiorDiff) {
       return (
         <div className="space-y-3 text-[15px] leading-relaxed">
@@ -248,17 +229,12 @@ export default function Teste() {
           <p>
             Seu padrão MBP mostra uma preferência natural pela dimensão <strong>Purpose</strong>. Você
             tende a priorizar processos orientados a propósito e a integrar Mind e Body através de uma
-            lente de significado e valores — isso é uma expressão autêntica de quem você é.
-          </p>
-          <p>
-            Nosso Programa Personalizado incluirá experiências que promovem a conexão com seu propósito,
-            integrando elementos mentais e corporais de forma significativa para você.
+            lente de significado e valores.
           </p>
         </div>
       )
     }
 
-    // Perfil: Transição
     return (
       <div className="space-y-3 text-[15px] leading-relaxed">
         <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-700">
@@ -266,12 +242,7 @@ export default function Teste() {
         </p>
         <p>
           Seu MBP Triangle indica um momento de transição interessante. As três dimensões estão
-          em processo de reequilíbrio, o que pode refletir uma fase de mudança ou redescoberta
-          de prioridades.
-        </p>
-        <p>
-          Este é o momento ideal para o Programa Inovarse. Vamos trabalhar juntos para entender
-          melhor suas preferências e construir um caminho personalizado para você.
+          em processo de reequilíbrio.
         </p>
       </div>
     )
@@ -286,12 +257,7 @@ export default function Teste() {
   // ─── Tela de Introdução ───────────────────────────────────────────────────
   if (showIntro) {
     return (
-      <div className="relative min-h-screen overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_BG})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/68 via-white/72 to-white/88" />
+      <div className="relative min-h-screen overflow-hidden bg-slate-50">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.12),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.10),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(59,130,246,0.10),transparent_25%)]" />
 
         <div className="relative flex min-h-screen items-center justify-center px-4 py-10 md:px-8">
@@ -320,23 +286,12 @@ export default function Teste() {
                 <p className="text-sm font-semibold text-emerald-800 mb-2">O que é o MBP Triangle?</p>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   O <strong>MBP Triangle</strong> é um modelo geométrico que representa como você
-                  naturalmente distribui seus recursos existenciais entre três dimensões fundamentais:
-                  <strong> Mind</strong> (processos cognitivos), <strong>Body</strong> (manutenção
-                  fisiológica) e <strong>Purpose</strong> (propósito e significado).
-                </p>
-              </div>
-
-              <div className="mt-4 rounded-2xl bg-blue-50 border border-blue-200 p-5">
-                <p className="text-sm font-semibold text-blue-800 mb-2">Importante: Preferências, não diagnóstico</p>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  Este teste mapeia suas <strong>preferências e aspirações pessoais</strong> — não
-                  indica evolução, nível de desenvolvimento ou o que é "certo" ou "errado". Não
-                  existe resultado melhor ou pior. Cada perfil é uma expressão autêntica de quem você é.
+                  naturalmente distribui seus recursos existenciais entre três dimensões fundamentais.
                 </p>
               </div>
 
               <div className="mt-8 space-y-4">
-                <p className="text-sm font-semibold text-slate-700">Seus dados (opcional)</p>
+                <p className="text-sm font-semibold text-slate-700">Seus dados (obrigatório)</p>
                 <input
                   type="text"
                   placeholder="Seu nome"
@@ -369,10 +324,6 @@ export default function Teste() {
                 Iniciar Mapeamento
                 <ArrowRight className="h-4 w-4" />
               </motion.button>
-
-              <p className="mt-4 text-center text-xs text-slate-400">
-                Seus dados são confidenciais e usados apenas para personalizar seu programa.
-              </p>
             </div>
           </motion.div>
         </div>
@@ -383,11 +334,7 @@ export default function Teste() {
   // ─── Tela dos Sliders ─────────────────────────────────────────────────────
   if (showSliders && !result) {
     return (
-      <div className="relative min-h-screen overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_BG})` }}
-        />
+      <div className="relative min-h-screen overflow-hidden bg-slate-50">
         <div className="absolute inset-0 bg-gradient-to-b from-white/68 via-white/72 to-white/90" />
 
         <div className="relative flex min-h-screen items-center justify-center px-4 py-10 md:px-8">
@@ -397,7 +344,6 @@ export default function Teste() {
             transition={{ duration: 0.55 }}
             className="w-full max-w-2xl space-y-8"
           >
-            {/* Seção 1: Preferências Primárias */}
             <section className="rounded-[2rem] border border-white/70 bg-white/82 p-8 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl">
               <h2 className="mb-2 text-center font-display text-2xl tracking-[-0.03em] text-slate-800 md:text-3xl">
                 1. Suas Preferências
@@ -407,12 +353,10 @@ export default function Teste() {
               </p>
 
               <div className="space-y-6">
-                {/* Mind */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft">
                   <div className="mb-3 flex items-center justify-between">
                     <div>
                       <span className="text-sm font-bold uppercase tracking-[0.18em] text-blue-700">Mind</span>
-                      <span className="ml-2 text-xs text-slate-400">Mente</span>
                     </div>
                     <span className="text-2xl font-bold text-blue-700">{mind}</span>
                   </div>
@@ -429,15 +373,12 @@ export default function Teste() {
                     }}
                     className="w-full cursor-pointer accent-blue-600"
                   />
-                  <p className="mt-2 text-xs text-slate-400">Processos cognitivos, reflexão, análise</p>
                 </div>
 
-                {/* Body */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft">
                   <div className="mb-3 flex items-center justify-between">
                     <div>
                       <span className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">Body</span>
-                      <span className="ml-2 text-xs text-slate-400">Corpo</span>
                     </div>
                     <span className="text-2xl font-bold text-emerald-700">{body}</span>
                   </div>
@@ -450,15 +391,12 @@ export default function Teste() {
                     onChange={(e) => setBody(Number(e.target.value))}
                     className="w-full cursor-pointer accent-emerald-600"
                   />
-                  <p className="mt-2 text-xs text-slate-400">Manutenção fisiológica, movimento, sensorialidade</p>
                 </div>
 
-                {/* Purpose (calculado) */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft opacity-80">
                   <div className="mb-3 flex items-center justify-between">
                     <div>
                       <span className="text-sm font-bold uppercase tracking-[0.18em] text-violet-700">Purpose</span>
-                      <span className="ml-2 text-xs text-slate-400">Propósito</span>
                     </div>
                     <span className="text-2xl font-bold text-violet-700">{purpose}</span>
                   </div>
@@ -468,16 +406,10 @@ export default function Teste() {
                       style={{ width: `${(purpose / 10) * 100}%` }}
                     />
                   </div>
-                  <p className="mt-2 text-xs text-slate-400">Calculado automaticamente · Propósito, conexão, significado</p>
-                </div>
-
-                <div className="rounded-xl bg-slate-50 px-4 py-3 text-center text-sm text-slate-600">
-                  Distribuição atual: Mind <strong>{mind}</strong> + Body <strong>{body}</strong> + Purpose <strong>{purpose}</strong> = <strong>10</strong>
                 </div>
               </div>
             </section>
 
-            {/* Seção 2: Preferências Pareadas */}
             <section className="rounded-[2rem] border border-white/70 bg-white/82 p-8 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl">
               <h2 className="mb-2 text-center font-display text-2xl tracking-[-0.03em] text-slate-800 md:text-3xl">
                 2. Preferências Relativas
@@ -487,7 +419,6 @@ export default function Teste() {
               </p>
 
               <div className="space-y-5">
-                {/* Mind vs Body */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft">
                   <div className="mb-4 flex items-center justify-between text-sm font-semibold uppercase tracking-[0.18em]">
                     <span className="text-blue-700">Mind</span>
@@ -507,13 +438,8 @@ export default function Teste() {
                     }
                     className="w-full cursor-pointer accent-emerald-600"
                   />
-                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-700">
-                    <span>{pairedMB.mind.toFixed(1)}</span>
-                    <span>{pairedMB.body.toFixed(1)}</span>
-                  </div>
                 </div>
 
-                {/* Body vs Purpose */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft">
                   <div className="mb-4 flex items-center justify-between text-sm font-semibold uppercase tracking-[0.18em]">
                     <span className="text-emerald-700">Body</span>
@@ -533,13 +459,8 @@ export default function Teste() {
                     }
                     className="w-full cursor-pointer accent-violet-600"
                   />
-                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-700">
-                    <span>{pairedBP.body.toFixed(1)}</span>
-                    <span>{pairedBP.purpose.toFixed(1)}</span>
-                  </div>
                 </div>
 
-                {/* Mind vs Purpose */}
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white/85 p-6 shadow-soft">
                   <div className="mb-4 flex items-center justify-between text-sm font-semibold uppercase tracking-[0.18em]">
                     <span className="text-blue-700">Mind</span>
@@ -559,10 +480,6 @@ export default function Teste() {
                     }
                     className="w-full cursor-pointer accent-blue-600"
                   />
-                  <div className="mt-3 flex justify-between text-sm font-semibold text-slate-700">
-                    <span>{pairedMP.mind.toFixed(1)}</span>
-                    <span>{pairedMP.purpose.toFixed(1)}</span>
-                  </div>
                 </div>
               </div>
             </section>
@@ -597,19 +514,14 @@ export default function Teste() {
     const whatsappMessage = encodeURIComponent(
       `Olá! Vim do site Inovarse e fiz o Teste MBP Triangle.\n\n` +
         `📊 Meu perfil MBP Triangle:\n` +
-        `• Mind (Mente): ${result.altMind} (preferência ${result.prefMind})\n` +
-        `• Body (Corpo): ${result.altBody} (preferência ${result.prefBody})\n` +
-        `• Purpose (Propósito): ${result.altPurpose} (preferência ${result.prefPurpose})\n\n` +
-        `Gostaria de agendar uma avaliação para entender melhor meu perfil e montar meu Programa Personalizado Inovarse.`
+        `• Mind (Mente): ${result.altMind}\n` +
+        `• Body (Corpo): ${result.altBody}\n` +
+        `• Purpose (Propósito): ${result.altPurpose}\n\n` +
+        `Gostaria de agendar uma avaliação.`
     )
 
     return (
-      <div className="relative min-h-screen overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${RESULT_BG})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/72 to-white/90" />
+      <div className="relative min-h-screen overflow-hidden bg-slate-50">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(16,185,129,0.10),transparent_30%),radial-gradient(circle_at_85%_25%,rgba(168,85,247,0.08),transparent_28%),radial-gradient(circle_at_50%_85%,rgba(59,130,246,0.08),transparent_24%)]" />
 
         <div className="relative flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
@@ -628,9 +540,6 @@ export default function Teste() {
                   <h1 className="mt-2 font-display text-4xl tracking-[-0.04em] text-slate-900 md:text-5xl">
                     Seu MBP Triangle
                   </h1>
-                  <p className="mt-2 text-sm text-slate-600 md:text-[15px]">
-                    Mind · Body · Purpose · Inovarse
-                  </p>
                 </div>
 
                 <button
@@ -651,12 +560,11 @@ export default function Teste() {
                 <TriangleVisualization data={result} />
               </motion.div>
 
-              {/* Cards de resultado */}
               <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                  { label: "Mind", sublabel: "Mente", value: result.altMind, pref: result.prefMind, icon: "🧠", color: "from-blue-600 to-cyan-600" },
-                  { label: "Body", sublabel: "Corpo", value: result.altBody, pref: result.prefBody, icon: "💪", color: "from-emerald-600 to-teal-600" },
-                  { label: "Purpose", sublabel: "Propósito", value: result.altPurpose, pref: result.prefPurpose, icon: "✨", color: "from-violet-600 to-fuchsia-600" },
+                  { label: "Mind", value: result.altMind, icon: "🧠", color: "from-blue-600 to-cyan-600" },
+                  { label: "Body", value: result.altBody, icon: "💪", color: "from-emerald-600 to-teal-600" },
+                  { label: "Purpose", value: result.altPurpose, icon: "✨", color: "from-violet-600 to-fuchsia-600" },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -666,36 +574,18 @@ export default function Teste() {
                     <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] opacity-85">
                       {item.label}
                     </p>
-                    <p className="text-[10px] opacity-60 mb-1">{item.sublabel}</p>
                     <p className="mt-1 text-4xl font-semibold tracking-[-0.05em]">
                       {item.value}
                     </p>
-                    <p className="mt-1 text-[11px] opacity-75">preferência: {item.pref}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Interpretação exploratória */}
               <div className="mb-8 rounded-[1.75rem] border border-emerald-200/70 bg-gradient-to-r from-emerald-50 to-white p-6 shadow-soft md:p-8">
                 <div className="text-slate-800">{getInterpretation(result)}</div>
               </div>
 
-              {/* Nota sobre Real Actuality */}
-              <div className="mb-6 rounded-[1.75rem] border border-blue-200/70 bg-blue-50 p-5">
-                <p className="text-sm font-semibold text-blue-800 mb-2">Próximo Passo: Avaliação Profissional</p>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  Este teste mapeou seu <strong>MBP Triangle de Preferências</strong> — o que você deseja.
-                  O próximo passo é uma avaliação com nossos profissionais para mapear seu
-                  <strong> Real Actuality Triangle</strong> — como você está agora. Juntos, esses dois
-                  triângulos formam a base do seu Programa Personalizado Inovarse.
-                </p>
-              </div>
-
-              {/* CTA WhatsApp */}
               <div className="rounded-[1.75rem] border border-slate-200 bg-white/90 p-6 text-center shadow-soft">
-                <p className="text-sm text-slate-600 mb-4">
-                  Fale com nossa equipe para agendar sua avaliação profissional
-                </p>
                 <a
                   href={`https://wa.me/351914845439?text=${whatsappMessage}`}
                   target="_blank"
@@ -705,13 +595,6 @@ export default function Teste() {
                   📱 Falar no WhatsApp
                 </a>
               </div>
-
-              <button
-                onClick={reset}
-                className="mt-4 w-full rounded-2xl bg-slate-100 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
-              >
-                Fazer Novo Teste
-              </button>
             </div>
           </motion.div>
         </div>
@@ -722,7 +605,6 @@ export default function Teste() {
   return null
 }
 
-// ─── Componente de Visualização do Triângulo ──────────────────────────────
 const TriangleVisualization = ({ data }: { data: ResultData }) => {
   const size = 380
   const centerX = size / 2
@@ -734,8 +616,6 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
   const T: Point = { x: centerX, y: centerY - radius }
   const Center: Point = { x: centerX, y: centerY }
 
-  // MIND: Base é a linha inferior (L → R), Topo é o Centro
-  // Balanço: Body puxa para L, Purpose puxa para R
   const pM = calculateIsoscelesPoint(
     data.prefMind,
     data.pairedMB.body,
@@ -745,8 +625,6 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
     Center
   )
 
-  // BODY: Base é o lado esquerdo (L → T), Topo é o Centro
-  // Balanço: Mind puxa para L, Purpose puxa para T
   const pB = calculateIsoscelesPoint(
     data.prefBody,
     data.pairedMB.mind,
@@ -756,8 +634,6 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
     Center
   )
 
-  // PURPOSE: Base é o lado direito (R → T), Topo é o Centro
-  // Balanço: Mind puxa para R, Body puxa para T
   const pP = calculateIsoscelesPoint(
     data.prefPurpose,
     data.pairedMP.mind,
@@ -780,7 +656,6 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
         viewBox={`0 0 ${size} ${size}`}
         className="relative drop-shadow-sm"
       >
-        {/* Sub-triângulos de fundo */}
         <polygon
           points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`}
           fill="#3b82f6"
@@ -797,7 +672,6 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
           fillOpacity="0.08"
         />
 
-        {/* Contorno principal */}
         <polygon
           points={`${L.x},${L.y} ${R.x},${R.y} ${T.x},${T.y}`}
           fill="none"
@@ -805,12 +679,10 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
           strokeWidth="1.5"
         />
 
-        {/* Linhas divisórias tracejadas */}
         <line x1={L.x} y1={L.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
         <line x1={R.x} y1={R.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
         <line x1={T.x} y1={T.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
 
-        {/* Triângulo MBP (Preferências do usuário) */}
         <polygon
           points={`${pM.x},${pM.y} ${pB.x},${pB.y} ${pP.x},${pP.y}`}
           fill="rgba(79, 70, 229, 0.20)"
@@ -819,15 +691,12 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
           strokeLinejoin="round"
         />
 
-        {/* Ponto central de equilíbrio */}
         <circle cx={Center.x} cy={Center.y} r="4" fill="#94a3b8" opacity="0.5" />
 
-        {/* Vértices plotados */}
         <circle cx={pM.x} cy={pM.y} r="6" fill="#3b82f6" stroke="white" strokeWidth="2.5" />
         <circle cx={pB.x} cy={pB.y} r="6" fill="#10b981" stroke="white" strokeWidth="2.5" />
         <circle cx={pP.x} cy={pP.y} r="6" fill="#8b5cf6" stroke="white" strokeWidth="2.5" />
 
-        {/* Rótulos */}
         <text
           x={size / 2}
           y={L.y + 28}
