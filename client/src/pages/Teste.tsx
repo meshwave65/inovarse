@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowRight, Loader2, RefreshCw, Sparkles, AlertCircle } from "lucide-react"
+import { ArrowRight, Loader2, RefreshCw, Sparkles, AlertCircle, Info } from "lucide-react"
 import { trpc } from "@/lib/trpc"
 import { toast } from "sonner"
 
@@ -118,7 +118,6 @@ export default function Teste() {
     }
 
     try {
-      console.log("Iniciando submissão de lead...");
       const leadResult = await submitLeadMutation.mutateAsync({
         nome: leads.nome.trim(),
         telefone: leads.telefone.trim(),
@@ -126,7 +125,6 @@ export default function Teste() {
       })
 
       if (leadResult.success && leadResult.leadId) {
-        console.log("Lead salvo com ID:", leadResult.leadId, ". Salvando resultado...");
         const resultSave = await submitResultMutation.mutateAsync({
           leadId: leadResult.leadId,
           mind: parseFloat(altMind),
@@ -139,15 +137,10 @@ export default function Teste() {
         
         if (resultSave.success) {
           toast.success("Seu perfil foi salvo com sucesso!")
-        } else {
-          toast.error(`Erro ao salvar resultado: ${resultSave.message}`)
         }
-      } else {
-        toast.error(`Erro ao registrar lead: ${leadResult.message}`)
       }
     } catch (err: any) {
-      console.error("Erro fatal na submissão:", err)
-      toast.error(`Erro de conexão: ${err.message || "Verifique o console do navegador"}`)
+      console.error("Erro na submissão:", err)
     } finally {
       setResult(res)
       localStorage.setItem("mbpTriangle_result", JSON.stringify(res))
@@ -285,7 +278,6 @@ export default function Teste() {
                   O MBP Triangle é uma ferramenta de autoavaliação que mapeia suas preferências e comportamentos
                   através de três dimensões fundamentais: <strong>Mind</strong> (Mente/Cognição),
                   <strong> Body</strong> (Corpo/Fisiologia) e <strong>Purpose</strong> (Propósito/Valores).
-                  Compreender seu padrão MBP ajuda na tomada de decisões mais alinhadas com quem você é.
                 </p>
               </div>
 
@@ -332,201 +324,164 @@ export default function Teste() {
 
   if (showSliders && !result) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/20">
+      <div className="relative min-h-screen bg-slate-50 overflow-x-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.08),transparent_35%),radial-gradient(circle_at_80%_80%,rgba(168,85,247,0.08),transparent_35%)]" />
 
-        <div className="relative flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-            className="w-full max-w-6xl"
-          >
-            {/* SEÇÃO 1: PREFERÊNCIAS BÁSICAS - PAINEL COMPACTO */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              {/* Painel de Controle - Esquerda */}
-              <motion.div
+        <div className="relative w-full max-w-7xl mx-auto px-4 py-6 md:py-10">
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            
+            {/* PAINEL DE CONTROLE - LADO ESQUERDO */}
+            <div className="w-full lg:w-7/12 space-y-6">
+              
+              {/* SEÇÃO 1: PREFERÊNCIAS BÁSICAS */}
+              <motion.section 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="rounded-[2rem] border border-white/70 bg-gradient-to-br from-white/95 to-white/85 p-6 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl"
+                className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur-xl"
               >
-                <div className="mb-6">
-                  <h2 className="text-lg font-display tracking-[-0.02em] text-slate-800 mb-1">
-                    Suas Preferências
-                  </h2>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Distribua sua energia entre as 3 dimensões (Total: 10)
-                  </p>
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="p-2 bg-emerald-100 rounded-lg text-emerald-700">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800 leading-none">1. Suas Preferências</h2>
+                    <p className="text-xs text-slate-500 mt-1">Distribua sua energia (Total: 10)</p>
+                  </div>
                 </div>
 
-                <div className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Mind Slider */}
-                  <div className="rounded-xl bg-gradient-to-br from-blue-50 to-blue-50/50 border border-blue-200/50 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase tracking-[0.15em] text-blue-700">🧠 Mind</span>
-                      <span className="text-xl font-bold text-blue-600">{mind}</span>
+                  <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Mind</span>
+                      <span className="text-lg font-black text-blue-700">{mind}</span>
                     </div>
                     <input
-                      type="range"
-                      min={0}
-                      max={10}
-                      step={0.5}
-                      value={mind}
+                      type="range" min={0} max={10} step={0.5} value={mind}
                       onChange={(e) => {
                         const v = Number(e.target.value)
                         setMind(v)
                         if (v + body > 10) setBody(Math.max(0, 10 - v))
                       }}
-                      className="w-full h-2 bg-blue-200 rounded-full appearance-none cursor-pointer accent-blue-600"
-                      style={{
-                        background: `linear-gradient(to right, rgb(37, 99, 235) 0%, rgb(37, 99, 235) ${(mind / 10) * 100}%, rgb(226, 232, 240) ${(mind / 10) * 100}%, rgb(226, 232, 240) 100%)`
-                      }}
+                      className="w-full h-1.5 bg-blue-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                     />
                   </div>
 
                   {/* Body Slider */}
-                  <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-50/50 border border-emerald-200/50 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase tracking-[0.15em] text-emerald-700">💪 Body</span>
-                      <span className="text-xl font-bold text-emerald-600">{body}</span>
+                  <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Body</span>
+                      <span className="text-lg font-black text-emerald-700">{body}</span>
                     </div>
                     <input
-                      type="range"
-                      min={0}
-                      max={Math.max(0, 10 - mind)}
-                      step={0.5}
-                      value={body}
+                      type="range" min={0} max={Math.max(0, 10 - mind)} step={0.5} value={body}
                       onChange={(e) => setBody(Number(e.target.value))}
-                      className="w-full h-2 bg-emerald-200 rounded-full appearance-none cursor-pointer accent-emerald-600"
-                      style={{
-                        background: `linear-gradient(to right, rgb(16, 185, 129) 0%, rgb(16, 185, 129) ${(body / (10 - mind)) * 100}%, rgb(226, 232, 240) ${(body / (10 - mind)) * 100}%, rgb(226, 232, 240) 100%)`
-                      }}
+                      className="w-full h-1.5 bg-emerald-200 rounded-full appearance-none cursor-pointer accent-emerald-600"
                     />
                   </div>
 
-                  {/* Purpose - Apenas Exibição */}
-                  <div className="rounded-xl bg-gradient-to-br from-violet-50 to-violet-50/50 border border-violet-200/50 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase tracking-[0.15em] text-violet-700">✨ Purpose</span>
-                      <span className="text-xl font-bold text-violet-600">{purpose}</span>
+                  {/* Purpose Display */}
+                  <div className="p-4 rounded-2xl bg-violet-50/50 border border-violet-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-violet-600">Purpose</span>
+                      <span className="text-lg font-black text-violet-700">{purpose}</span>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-violet-200 overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-violet-500 to-violet-400 transition-all duration-300"
-                        style={{ width: `${(purpose / 10) * 100}%` }}
+                    <div className="w-full h-1.5 bg-violet-200 rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-violet-500"
+                        animate={{ width: `${(purpose / 10) * 100}%` }}
                       />
                     </div>
                   </div>
                 </div>
+              </motion.section>
 
-                <div className="mt-6 p-4 rounded-lg bg-blue-50 border border-blue-200/50">
-                  <p className="text-xs text-blue-700 font-medium">
-                    💡 <strong>Dica:</strong> Mind + Body + Purpose = 10
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Visualização do Triângulo - Direita */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
+              {/* SEÇÃO 2: PREFERÊNCIAS RELATIVAS (PARES) */}
+              <motion.section 
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl flex items-center justify-center"
+                transition={{ delay: 0.1 }}
+                className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur-xl"
               >
-                <div className="w-full">
-                  <p className="text-xs text-slate-500 font-medium text-center mb-4">Visualização em Tempo Real</p>
-                  <TriangleVisualization data={{
-                    altMind: mind.toString(),
-                    altBody: body.toString(),
-                    altPurpose: purpose.toString(),
-                    deslocMind: "0",
-                    deslocBody: "0",
-                    deslocPurpose: "0",
-                    prefMind: mind,
-                    prefBody: body,
-                    prefPurpose: purpose,
-                    pairedMB,
-                    pairedBP,
-                    pairedMP,
-                  }} />
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="p-2 bg-blue-100 rounded-lg text-blue-700">
+                    <RefreshCw className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800 leading-none">2. Preferências Relativas</h2>
+                    <p className="text-xs text-slate-500 mt-1">Mova o slider em direção ao que considera mais relevante</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Pair: Mind vs Body */}
+                  <PairControl 
+                    labelL="Mind" labelR="Body" 
+                    valL={pairedMB.mind} valR={pairedMB.body}
+                    colorL="#2563eb" colorR="#10b981"
+                    onChange={(v) => setPairedMB({ mind: v, body: 10 - v })}
+                  />
+
+                  {/* Pair: Body vs Purpose */}
+                  <PairControl 
+                    labelL="Body" labelR="Purpose" 
+                    valL={pairedBP.body} valR={pairedBP.purpose}
+                    colorL="#10b981" colorR="#8b5cf6"
+                    onChange={(v) => setPairedBP({ body: v, purpose: 10 - v })}
+                  />
+
+                  {/* Pair: Mind vs Purpose */}
+                  <PairControl 
+                    labelL="Mind" labelR="Purpose" 
+                    valL={pairedMP.mind} valR={pairedMP.purpose}
+                    colorL="#2563eb" colorR="#8b5cf6"
+                    onChange={(v) => setPairedMP({ mind: v, purpose: 10 - v })}
+                  />
+                </div>
+              </motion.section>
+
+              {/* BOTÃO DE CÁLCULO */}
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={calcular}
+                disabled={loading}
+                className={`${primaryButtonClass} w-full py-4 text-base shadow-2xl`}
+              >
+                {loading ? (
+                  <><Loader2 className="h-5 w-5 animate-spin" /> Calculando...</>
+                ) : (
+                  <><Sparkles className="h-5 w-5" /> Ver Meu MBP Triangle</>
+                )}
+              </motion.button>
+            </div>
+
+            {/* VISUALIZAÇÃO DO TRIÂNGULO - LADO DIREITO (FIXO/STRECH) */}
+            <div className="w-full lg:w-5/12 lg:sticky lg:top-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="rounded-3xl border border-white/70 bg-white/40 p-6 shadow-2xl backdrop-blur-md flex flex-col items-center"
+              >
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6">Visualização em Tempo Real</p>
+                <TriangleVisualization data={{
+                  altMind: mind.toString(),
+                  altBody: body.toString(),
+                  altPurpose: purpose.toString(),
+                  deslocMind: "0", deslocBody: "0", deslocPurpose: "0",
+                  prefMind: mind, prefBody: body, prefPurpose: purpose,
+                  pairedMB, pairedBP, pairedMP,
+                }} />
+                
+                <div className="mt-8 grid grid-cols-3 gap-3 w-full">
+                  <ValueIndicator label="Mind" val={mind} color="bg-blue-500" />
+                  <ValueIndicator label="Body" val={body} color="bg-emerald-500" />
+                  <ValueIndicator label="Purpose" val={purpose} color="bg-violet-500" />
                 </div>
               </motion.div>
             </div>
 
-            {/* SEÇÃO 2: PREFERÊNCIAS RELATIVAS - PAINEL COMPACTO */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="rounded-[2rem] border border-white/70 bg-gradient-to-br from-white/95 to-white/85 p-6 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl mb-6"
-            >
-              <div className="mb-6">
-                <h2 className="text-lg font-display tracking-[-0.02em] text-slate-800 mb-1">
-                  Preferências Relativas (Pares)
-                </h2>
-                <p className="text-xs text-slate-500 font-medium">
-                  Quando precisa escolher entre dois aspectos, qual você prefere? (Mova para indicar importância)
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Mind vs Body */}
-                <PairSlider
-                  label1="🧠 Mind"
-                  label2="💪 Body"
-                  color1="blue"
-                  color2="emerald"
-                  value1={pairedMB.mind}
-                  value2={pairedMB.body}
-                  onChange={(val) => setPairedMB({ mind: val, body: 10 - val })}
-                />
-
-                {/* Body vs Purpose */}
-                <PairSlider
-                  label1="💪 Body"
-                  label2="✨ Purpose"
-                  color1="emerald"
-                  color2="violet"
-                  value1={pairedBP.body}
-                  value2={pairedBP.purpose}
-                  onChange={(val) => setPairedBP({ body: val, purpose: 10 - val })}
-                />
-
-                {/* Mind vs Purpose */}
-                <PairSlider
-                  label1="🧠 Mind"
-                  label2="✨ Purpose"
-                  color1="blue"
-                  color2="violet"
-                  value1={pairedMP.mind}
-                  value2={pairedMP.purpose}
-                  onChange={(val) => setPairedMP({ mind: val, purpose: 10 - val })}
-                />
-              </div>
-            </motion.div>
-
-            {/* Botão de Cálculo */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={calcular}
-              disabled={loading}
-              className={`${primaryButtonClass} w-full py-4 text-base`}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Calculando seu MBP Triangle...
-                </>
-              ) : (
-                <>
-                  Ver Meu MBP Triangle
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </motion.button>
-          </motion.div>
+          </div>
         </div>
       </div>
     )
@@ -627,199 +582,103 @@ export default function Teste() {
   return null
 }
 
-// Componente para Sliders de Pares com Lógica de Soma 10
-const PairSlider = ({
-  label1,
-  label2,
-  color1,
-  color2,
-  value1,
-  value2,
-  onChange,
-}: {
-  label1: string
-  label2: string
-  color1: string
-  color2: string
-  value1: number
-  value2: number
-  onChange: (val: number) => void
-}) => {
-  const colorMap: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
-    blue: { bg: "bg-blue-50", border: "border-blue-200/50", text: "text-blue-700", gradient: "from-blue-500 to-blue-400" },
-    emerald: { bg: "bg-emerald-50", border: "border-emerald-200/50", text: "text-emerald-700", gradient: "from-emerald-500 to-emerald-400" },
-    violet: { bg: "bg-violet-50", border: "border-violet-200/50", text: "text-violet-700", gradient: "from-violet-500 to-violet-400" },
-  }
-
-  const c1 = colorMap[color1]
-  const c2 = colorMap[color2]
-
+// COMPONENTE PARA CONTROLE DE PARES (Lógica Soma 10)
+const PairControl = ({ labelL, labelR, valL, valR, colorL, colorR, onChange }: any) => {
   return (
-    <div className={`rounded-xl ${c1.bg} border ${c1.border} p-4`}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-600">{label1}</span>
-        <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-600">{label2}</span>
+    <div className="group relative bg-slate-50/50 rounded-2xl p-4 border border-slate-100 hover:border-slate-200 transition-all">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col items-start">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{labelL}</span>
+          <span className="text-xl font-black" style={{ color: colorL }}>{valL}</span>
+        </div>
+        
+        <div className="flex flex-col items-center">
+          <div className="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center">
+            <RefreshCw className="w-3 h-3 text-slate-300 group-hover:rotate-180 transition-transform duration-500" />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{labelR}</span>
+          <span className="text-xl font-black" style={{ color: colorR }}>{valR}</span>
+        </div>
       </div>
 
-      {/* Valores Numéricos */}
-      <div className="flex items-center justify-between mb-3 px-2">
-        <div className="text-center">
-          <div className="text-lg font-bold text-blue-600">{value1}</div>
+      <div className="relative flex items-center">
+        {/* Números de Referência */}
+        <div className="absolute -top-1 left-0 right-0 flex justify-between px-1 pointer-events-none">
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+            <span key={n} className="text-[8px] font-bold text-slate-300">{n}</span>
+          ))}
         </div>
-        <div className="text-xs text-slate-400 font-semibold">↔</div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-emerald-600">{value2}</div>
-        </div>
+        
+        <input
+          type="range" min={0} max={10} step={0.5} value={valL}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full h-2 mt-4 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-800"
+          style={{
+            background: `linear-gradient(to right, ${colorL} 0%, ${colorL} ${(valL/10)*100}%, ${colorR} ${(valL/10)*100}%, ${colorR} 100%)`
+          }}
+        />
       </div>
-
-      {/* Slider com Gradiente */}
-      <input
-        type="range"
-        min={0}
-        max={10}
-        step={0.5}
-        value={value1}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-3 rounded-full appearance-none cursor-pointer"
-        style={{
-          background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${(value1 / 10) * 100}%, rgb(16, 185, 129) ${(value1 / 10) * 100}%, rgb(16, 185, 129) 100%)`
-        }}
-      />
-
-      <div className="mt-2 text-center">
-        <span className="text-xs text-slate-500 font-medium">
-          {value1 > 5 ? `← ${label1} mais importante` : value1 < 5 ? `${label2} mais importante →` : "Equilibrado"}
-        </span>
+      
+      <div className="mt-3 flex justify-between items-center px-1">
+        <span className={`text-[9px] font-bold transition-opacity ${valL > 5 ? 'opacity-100' : 'opacity-30'}`} style={{ color: colorL }}>PREFERÊNCIA {labelL.toUpperCase()}</span>
+        <span className={`text-[9px] font-bold transition-opacity ${valR > 5 ? 'opacity-100' : 'opacity-30'}`} style={{ color: colorR }}>PREFERÊNCIA {labelR.toUpperCase()}</span>
       </div>
     </div>
   )
 }
 
+const ValueIndicator = ({ label, val, color }: any) => (
+  <div className="flex flex-col items-center p-2 rounded-xl bg-white/50 border border-white/80">
+    <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 mb-1">{label}</span>
+    <div className="flex items-center gap-1.5">
+      <div className={`w-1.5 h-1.5 rounded-full ${color}`} />
+      <span className="text-sm font-black text-slate-700">{val}</span>
+    </div>
+  </div>
+)
+
 const TriangleVisualization = ({ data }: { data: ResultData }) => {
-  const size = 320
+  const size = 300
   const centerX = size / 2
   const centerY = size / 2 + 10
-  const radius = 130
+  const radius = 120
 
   const L: Point = { x: centerX - (radius * Math.sqrt(3)) / 2, y: centerY + radius / 2 }
   const R: Point = { x: centerX + (radius * Math.sqrt(3)) / 2, y: centerY + radius / 2 }
   const T: Point = { x: centerX, y: centerY - radius }
   const Center: Point = { x: centerX, y: centerY }
 
-  const pM = calculateIsoscelesPoint(
-    data.prefMind,
-    data.pairedMB.body,
-    data.pairedMP.purpose,
-    L,
-    R,
-    Center
-  )
-
-  const pB = calculateIsoscelesPoint(
-    data.prefBody,
-    data.pairedMB.mind,
-    data.pairedBP.purpose,
-    L,
-    T,
-    Center
-  )
-
-  const pP = calculateIsoscelesPoint(
-    data.prefPurpose,
-    data.pairedMP.mind,
-    data.pairedBP.body,
-    R,
-    T,
-    Center
-  )
+  const pM = calculateIsoscelesPoint(data.prefMind, data.pairedMB.body, data.pairedMP.purpose, L, R, Center)
+  const pB = calculateIsoscelesPoint(data.prefBody, data.pairedMB.mind, data.pairedBP.purpose, L, T, Center)
+  const pP = calculateIsoscelesPoint(data.prefPurpose, data.pairedMP.mind, data.pairedBP.body, R, T, Center)
 
   return (
-    <motion.div
-      animate={{ y: [0, -4, 0] }}
-      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      className="relative overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/82 p-3 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur-2xl"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_85%_20%,rgba(168,85,247,0.08),transparent_26%),radial-gradient(circle_at_50%_90%,rgba(16,185,129,0.08),transparent_24%)]" />
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="relative drop-shadow-sm"
-      >
-        <polygon
-          points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`}
-          fill="#3b82f6"
-          fillOpacity="0.08"
-        />
-        <polygon
-          points={`${L.x},${L.y} ${T.x},${T.y} ${Center.x},${Center.y}`}
-          fill="#10b981"
-          fillOpacity="0.08"
-        />
-        <polygon
-          points={`${R.x},${R.y} ${T.x},${T.y} ${Center.x},${Center.y}`}
-          fill="#8b5cf6"
-          fillOpacity="0.08"
-        />
-
-        <polygon
-          points={`${L.x},${L.y} ${R.x},${R.y} ${T.x},${T.y}`}
-          fill="none"
-          stroke="#cbd5e1"
-          strokeWidth="1.5"
-        />
-
-        <line x1={L.x} y1={L.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
-        <line x1={R.x} y1={R.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
-        <line x1={T.x} y1={T.y} x2={Center.x} y2={Center.y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4" />
-
+    <div className="relative">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-2xl">
+        <polygon points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`} fill="#3b82f6" fillOpacity="0.05" />
+        <polygon points={`${L.x},${L.y} ${T.x},${T.y} ${Center.x},${Center.y}`} fill="#10b981" fillOpacity="0.05" />
+        <polygon points={`${R.x},${R.y} ${T.x},${T.y} ${Center.x},${Center.y}`} fill="#8b5cf6" fillOpacity="0.05" />
+        <polygon points={`${L.x},${L.y} ${R.x},${R.y} ${T.x},${T.y}`} fill="none" stroke="#e2e8f0" strokeWidth="1" />
+        
         <polygon
           points={`${pM.x},${pM.y} ${pB.x},${pB.y} ${pP.x},${pP.y}`}
-          fill="rgba(79, 70, 229, 0.20)"
-          stroke="#4f46e5"
-          strokeWidth="2.5"
+          fill="rgba(37, 99, 235, 0.15)"
+          stroke="#2563eb"
+          strokeWidth="3"
           strokeLinejoin="round"
         />
-
-        <circle cx={Center.x} cy={Center.y} r="3" fill="#94a3b8" opacity="0.5" />
 
         <circle cx={pM.x} cy={pM.y} r="5" fill="#3b82f6" stroke="white" strokeWidth="2" />
         <circle cx={pB.x} cy={pB.y} r="5" fill="#10b981" stroke="white" strokeWidth="2" />
         <circle cx={pP.x} cy={pP.y} r="5" fill="#8b5cf6" stroke="white" strokeWidth="2" />
 
-        <text
-          x={size / 2}
-          y={L.y + 22}
-          textAnchor="middle"
-          fontSize="11"
-          fontWeight="700"
-          fill="#1d4ed8"
-        >
-          MIND
-        </text>
-        <text
-          x={L.x - 14}
-          y={L.y - (L.y - T.y) / 2}
-          textAnchor="middle"
-          fontSize="11"
-          fontWeight="700"
-          fill="#047857"
-          transform={`rotate(-60, ${L.x - 14}, ${L.y - (L.y - T.y) / 2})`}
-        >
-          BODY
-        </text>
-        <text
-          x={R.x + 14}
-          y={R.y - (R.y - T.y) / 2}
-          textAnchor="middle"
-          fontSize="11"
-          fontWeight="700"
-          fill="#6d28d9"
-          transform={`rotate(60, ${R.x + 14}, ${R.y - (R.y - T.y) / 2})`}
-        >
-          PURPOSE
-        </text>
+        <text x={size/2} y={L.y + 20} textAnchor="middle" fontSize="10" fontWeight="900" fill="#3b82f6">MIND</text>
+        <text x={L.x - 15} y={L.y - 60} textAnchor="middle" fontSize="10" fontWeight="900" fill="#10b981" transform={`rotate(-60, ${L.x-15}, ${L.y-60})`}>BODY</text>
+        <text x={R.x + 15} y={R.y - 60} textAnchor="middle" fontSize="10" fontWeight="900" fill="#8b5cf6" transform={`rotate(60, ${R.x+15}, ${R.y-60})`}>PURPOSE</text>
       </svg>
-    </motion.div>
+    </div>
   )
 }
