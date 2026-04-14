@@ -674,86 +674,110 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
   return (
     <div className="relative">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-2xl overflow-visible">
-        {/* Triângulo da Harmonia (TH) - Sub-triângulos Coloridos */}
+        {/* DEFINIÇÃO DE GRADIENTES PARA AS ÁREAS DIMENSIONAIS */}
+        <defs>
+          <linearGradient id="gradMind" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.2" />
+          </linearGradient>
+          <linearGradient id="gradBody" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#34d399" stopOpacity="0.2" />
+          </linearGradient>
+          <linearGradient id="gradPurpose" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+
+        {/* ÁREAS DIMENSIONAIS DO TRIÂNGULO DA HARMONIA (SEM SOBREPOSIÇÃO) */}
+        {/* MENTE (BASE) */}
         <polygon 
           points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`} 
-          fill="#3b82f6" 
-          fillOpacity="0.35" 
+          fill="url(#gradMind)"
           className="transition-all duration-500"
         />
+        {/* CORPO (ESQUERDA) */}
         <polygon 
           points={`${L.x},${L.y} ${T.x},${T.y} ${Center.x},${Center.y}`} 
-          fill="#10b981" 
-          fillOpacity="0.35" 
+          fill="url(#gradBody)"
           className="transition-all duration-500"
         />
+        {/* ESPÍRITO/PROPÓSITO (DIREITA) */}
         <polygon 
           points={`${R.x},${R.y} ${T.x},${T.y} ${Center.x},${Center.y}`} 
-          fill="#8b5cf6" 
-          fillOpacity="0.35" 
+          fill="url(#gradPurpose)"
           className="transition-all duration-500"
         />
         
-        {/* Borda Externa do Triângulo Equilátero */}
+        {/* LINHAS DIVISÓRIAS INTERNAS (DO CENTRO PARA OS VÉRTICES) */}
+        <line x1={Center.x} y1={Center.y} x2={L.x} y2={L.y} stroke="white" strokeWidth="2" strokeOpacity="0.5" />
+        <line x1={Center.x} y1={Center.y} x2={R.x} y2={R.y} stroke="white" strokeWidth="2" strokeOpacity="0.5" />
+        <line x1={Center.x} y1={Center.y} x2={T.x} y2={T.y} stroke="white" strokeWidth="2" strokeOpacity="0.5" />
+
+        {/* BORDA EXTERNA DO TRIÂNGULO EQUILÁTERO */}
         <polygon points={`${L.x},${L.y} ${R.x},${R.y} ${T.x},${T.y}`} fill="none" stroke="#e2e8f0" strokeWidth="1" />
         
-        {/* Triângulo de Preferência do Usuário (MBP) */}
+        {/* TRIÂNGULO DE PREFERÊNCIA DO USUÁRIO (MBP) */}
         <polygon
           points={`${pM.x},${pM.y} ${pB.x},${pB.y} ${pP.x},${pP.y}`}
-          fill="rgba(255, 255, 255, 0.4)"
-          stroke="#1e293b"
+          fill="none"
+          stroke="white"
           strokeWidth="3"
-          strokeLinejoin="round"
+          strokeDasharray="5,5"
           className="transition-all duration-300"
         />
+        
+        {/* LINHAS CONECTANDO OS PONTOS AO CENTRO (OPCIONAL PARA CLAREZA) */}
+        <line x1={pM.x} y1={pM.y} x2={pB.x} y2={pB.y} stroke="white" strokeWidth="2" strokeLinecap="round" />
+        <line x1={pB.x} y1={pB.y} x2={pP.x} y2={pP.y} stroke="white" strokeWidth="2" strokeLinecap="round" />
+        <line x1={pP.x} y1={pP.y} x2={pM.x} y2={pM.y} stroke="white" strokeWidth="2" strokeLinecap="round" />
 
-        {/* Pontos de Intersecção */}
-        <circle cx={pM.x} cy={pM.y} r="5" fill="#3b82f6" stroke="white" strokeWidth="2" />
-        <circle cx={pB.x} cy={pB.y} r="5" fill="#10b981" stroke="white" strokeWidth="2" />
-        <circle cx={pP.x} cy={pP.y} r="5" fill="#8b5cf6" stroke="white" strokeWidth="2" />
+        {/* PONTOS DE INTERSECÇÃO (MBP) */}
+        <circle cx={pM.x} cy={pM.y} r="6" fill="#3b82f6" stroke="white" strokeWidth="2.5" />
+        <circle cx={pB.x} cy={pB.y} r="6" fill="#10b981" stroke="white" strokeWidth="2.5" />
+        <circle cx={pP.x} cy={pP.y} r="6" fill="#8b5cf6" stroke="white" strokeWidth="2.5" />
 
-        {/* Rótulos das Dimensões - Centralizados nos Lados */}
-        {/* MIND (Lado Inferior) */}
+        {/* RÓTULOS DAS DIMENSÕES - CENTRALIZADOS NOS LADOS */}
+        {/* MIND (BASE) */}
         <text 
           x={centerX} 
-          y={L.y + 25} 
+          y={L.y + 35} 
           textAnchor="middle" 
-          fontSize="11" 
+          fontSize="14" 
           fontWeight="900" 
           fill="#3b82f6"
-          className="tracking-widest"
+          className="tracking-[0.3em]"
         >
-          MIND
+          MENTE
         </text>
 
-        {/* BODY (Lado Esquerdo) */}
-        {/* Ponto médio do lado L-T: (L.x+T.x)/2, (L.y+T.y)/2 */}
+        {/* CORPO (ESQUERDA) */}
         <text 
-          x={(L.x + T.x) / 2 - 25} 
+          x={(L.x + T.x) / 2 - 40} 
           y={(L.y + T.y) / 2} 
           textAnchor="middle" 
-          fontSize="11" 
+          fontSize="14" 
           fontWeight="900" 
           fill="#10b981"
-          className="tracking-widest"
-          transform={`rotate(-60, ${(L.x + T.x) / 2 - 25}, ${(L.y + T.y) / 2})`}
+          className="tracking-[0.3em]"
+          transform={`rotate(-60, ${(L.x + T.x) / 2 - 40}, ${(L.y + T.y) / 2})`}
         >
-          BODY
+          CORPO
         </text>
 
-        {/* PURPOSE (Lado Direito) */}
-        {/* Ponto médio do lado R-T: (R.x+T.x)/2, (R.y+T.y)/2 */}
+        {/* ESPÍRITO (DIREITA) */}
         <text 
-          x={(R.x + T.x) / 2 + 25} 
+          x={(R.x + T.x) / 2 + 40} 
           y={(R.y + T.y) / 2} 
           textAnchor="middle" 
-          fontSize="11" 
+          fontSize="14" 
           fontWeight="900" 
           fill="#8b5cf6"
-          className="tracking-widest"
-          transform={`rotate(60, ${(R.x + T.x) / 2 + 25}, ${(R.y + T.y) / 2})`}
+          className="tracking-[0.3em]"
+          transform={`rotate(60, ${(R.x + T.x) / 2 + 40}, ${(R.y + T.y) / 2})`}
         >
-          PURPOSE
+          ESPÍRITO
         </text>
       </svg>
     </div>
