@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowRight, Loader2, RefreshCw, Sparkles, AlertCircle, Info } from "lucide-react"
+import { ArrowRight, Loader2, RefreshCw, Sparkles, AlertCircle, Info, ChevronLeft } from "lucide-react"
 import { trpc } from "@/lib/trpc"
 import { toast } from "sonner"
 
@@ -258,7 +258,7 @@ export default function Teste() {
             className="w-full max-w-2xl"
           >
             <div className="rounded-[2rem] border border-white/70 bg-white/82 p-8 shadow-[0_28px_90px_-38px_rgba(15,23,42,0.38)] backdrop-blur-2xl md:p-12">
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-2 flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
                 <img src="/logo_inovarse.jpeg" alt="Inovarse" className="w-8 h-8 rounded-full" />
                 <span className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                   Inovarse
@@ -327,7 +327,24 @@ export default function Teste() {
       <div className="relative min-h-screen bg-slate-50 overflow-x-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.08),transparent_35%),radial-gradient(circle_at_80%_80%,rgba(168,85,247,0.08),transparent_35%)]" />
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 py-6 md:py-10">
+        <div className="relative w-full max-w-7xl mx-auto px-4 py-4 md:py-8">
+          
+          {/* BARRA DE TOPO COM BOTÃO VOLTAR E LOGO */}
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={reset}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all text-xs font-semibold"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Voltar ao Início
+            </button>
+            
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+              <img src="/logo_inovarse.jpeg" alt="Inovarse" className="w-6 h-6 rounded-full" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">Inovarse</span>
+            </div>
+          </div>
+
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             
             {/* PAINEL DE CONTROLE - LADO ESQUERDO */}
@@ -605,7 +622,6 @@ const PairControl = ({ labelL, labelR, valL, valR, colorL, colorR, onChange }: a
       </div>
 
       <div className="relative flex items-center">
-        {/* Números de Referência */}
         <div className="absolute -top-1 left-0 right-0 flex justify-between px-1 pointer-events-none">
           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
             <span key={n} className="text-[8px] font-bold text-slate-300">{n}</span>
@@ -641,10 +657,10 @@ const ValueIndicator = ({ label, val, color }: any) => (
 )
 
 const TriangleVisualization = ({ data }: { data: ResultData }) => {
-  const size = 300
+  const size = 320
   const centerX = size / 2
   const centerY = size / 2 + 10
-  const radius = 120
+  const radius = 125
 
   const L: Point = { x: centerX - (radius * Math.sqrt(3)) / 2, y: centerY + radius / 2 }
   const R: Point = { x: centerX + (radius * Math.sqrt(3)) / 2, y: centerY + radius / 2 }
@@ -657,27 +673,88 @@ const TriangleVisualization = ({ data }: { data: ResultData }) => {
 
   return (
     <div className="relative">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-2xl">
-        <polygon points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`} fill="#3b82f6" fillOpacity="0.05" />
-        <polygon points={`${L.x},${L.y} ${T.x},${T.y} ${Center.x},${Center.y}`} fill="#10b981" fillOpacity="0.05" />
-        <polygon points={`${R.x},${R.y} ${T.x},${T.y} ${Center.x},${Center.y}`} fill="#8b5cf6" fillOpacity="0.05" />
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-2xl overflow-visible">
+        {/* Triângulo da Harmonia (TH) - Sub-triângulos Coloridos */}
+        <polygon 
+          points={`${L.x},${L.y} ${R.x},${R.y} ${Center.x},${Center.y}`} 
+          fill="#3b82f6" 
+          fillOpacity="0.35" 
+          className="transition-all duration-500"
+        />
+        <polygon 
+          points={`${L.x},${L.y} ${T.x},${T.y} ${Center.x},${Center.y}`} 
+          fill="#10b981" 
+          fillOpacity="0.35" 
+          className="transition-all duration-500"
+        />
+        <polygon 
+          points={`${R.x},${R.y} ${T.x},${T.y} ${Center.x},${Center.y}`} 
+          fill="#8b5cf6" 
+          fillOpacity="0.35" 
+          className="transition-all duration-500"
+        />
+        
+        {/* Borda Externa do Triângulo Equilátero */}
         <polygon points={`${L.x},${L.y} ${R.x},${R.y} ${T.x},${T.y}`} fill="none" stroke="#e2e8f0" strokeWidth="1" />
         
+        {/* Triângulo de Preferência do Usuário (MBP) */}
         <polygon
           points={`${pM.x},${pM.y} ${pB.x},${pB.y} ${pP.x},${pP.y}`}
-          fill="rgba(37, 99, 235, 0.15)"
-          stroke="#2563eb"
+          fill="rgba(255, 255, 255, 0.4)"
+          stroke="#1e293b"
           strokeWidth="3"
           strokeLinejoin="round"
+          className="transition-all duration-300"
         />
 
+        {/* Pontos de Intersecção */}
         <circle cx={pM.x} cy={pM.y} r="5" fill="#3b82f6" stroke="white" strokeWidth="2" />
         <circle cx={pB.x} cy={pB.y} r="5" fill="#10b981" stroke="white" strokeWidth="2" />
         <circle cx={pP.x} cy={pP.y} r="5" fill="#8b5cf6" stroke="white" strokeWidth="2" />
 
-        <text x={size/2} y={L.y + 20} textAnchor="middle" fontSize="10" fontWeight="900" fill="#3b82f6">MIND</text>
-        <text x={L.x - 15} y={L.y - 60} textAnchor="middle" fontSize="10" fontWeight="900" fill="#10b981" transform={`rotate(-60, ${L.x-15}, ${L.y-60})`}>BODY</text>
-        <text x={R.x + 15} y={R.y - 60} textAnchor="middle" fontSize="10" fontWeight="900" fill="#8b5cf6" transform={`rotate(60, ${R.x+15}, ${R.y-60})`}>PURPOSE</text>
+        {/* Rótulos das Dimensões - Centralizados nos Lados */}
+        {/* MIND (Lado Inferior) */}
+        <text 
+          x={centerX} 
+          y={L.y + 25} 
+          textAnchor="middle" 
+          fontSize="11" 
+          fontWeight="900" 
+          fill="#3b82f6"
+          className="tracking-widest"
+        >
+          MIND
+        </text>
+
+        {/* BODY (Lado Esquerdo) */}
+        {/* Ponto médio do lado L-T: (L.x+T.x)/2, (L.y+T.y)/2 */}
+        <text 
+          x={(L.x + T.x) / 2 - 25} 
+          y={(L.y + T.y) / 2} 
+          textAnchor="middle" 
+          fontSize="11" 
+          fontWeight="900" 
+          fill="#10b981"
+          className="tracking-widest"
+          transform={`rotate(-60, ${(L.x + T.x) / 2 - 25}, ${(L.y + T.y) / 2})`}
+        >
+          BODY
+        </text>
+
+        {/* PURPOSE (Lado Direito) */}
+        {/* Ponto médio do lado R-T: (R.x+T.x)/2, (R.y+T.y)/2 */}
+        <text 
+          x={(R.x + T.x) / 2 + 25} 
+          y={(R.y + T.y) / 2} 
+          textAnchor="middle" 
+          fontSize="11" 
+          fontWeight="900" 
+          fill="#8b5cf6"
+          className="tracking-widest"
+          transform={`rotate(60, ${(R.x + T.x) / 2 + 25}, ${(R.y + T.y) / 2})`}
+        >
+          PURPOSE
+        </text>
       </svg>
     </div>
   )
