@@ -123,7 +123,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Telefone</h3>
-                    <p className="text-sm text-muted-foreground">(11) 9999-9999</p>
+                    <p className="text-sm text-muted-foreground">(21) 972 341 965</p>
                   </div>
                 </div>
               </CardContent>
@@ -137,7 +137,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Localização</h3>
-                    <p className="text-sm text-muted-foreground">São Paulo, SP</p>
+                    <p className="text-sm text-muted-foreground">Rio de Janeiro, RJ</p>
                   </div>
                 </div>
               </CardContent>
