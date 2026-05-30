@@ -109,7 +109,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                    <p className="text-sm text-muted-foreground">contato@inovarse.com</p>
+                    <p className="text-sm text-muted-foreground">info@inovarsesaude.com.br</p>
                   </div>
                 </div>
               </CardContent>
